@@ -655,7 +655,7 @@ footer {
 /* ═══════════════════════════════════════════════════════════
    SAI MEGHANA — INTERACTIVE 3D BACKGROUND ENGINE
    Architecture: Three.js r128
-   Theme: Light Sky Blue Blueprint Integration 
+   Theme: Dark Sky Blue Blueprint Integration 
    Interaction: Desktop Hover Raycasting, Drag to Orbit, Particle Repulsion
 ═══════════════════════════════════════════════════════════ */
 
@@ -696,16 +696,16 @@ const state = {
 
 const raycaster = new THREE.Raycaster();
 
-// ── MINIMAL THEME PALETTE (LIGHT SKY BLUE & NAVY) ──────────
+// ── MINIMAL THEME PALETTE (DARK SKY BLUE & NAVY) ──────────
 const C = {
   ground: new THREE.Color(0xffffff),
-  cyan:   new THREE.Color(0x87ceeb), // Light Sky Blue
+  cyan:   new THREE.Color(0x007ba7), // Dark Sky Blue
   navy:   new THREE.Color(0x001f3f)
 };
 
 // ── MATERIALS ─────────────────────────────────────────────
 const MAT = {
-  // Light Sky Blue glowing blueprints
+  // Dark Sky Blue glowing blueprints
   blueprint: new THREE.MeshBasicMaterial({
     color: C.cyan, wireframe: true, transparent: true, opacity: 0.15
   }),
@@ -717,7 +717,7 @@ const MAT = {
     color: 0x003366, transparent: true, opacity: 0.7,
     emissive: 0x001229, emissiveIntensity: 0.2
   }),
-  // Clean white solids with subtle sky blue bounce light
+  // Clean white solids with subtle dark sky blue bounce light
   solid: new THREE.MeshLambertMaterial({
     color: 0xffffff,
     emissive: C.cyan, emissiveIntensity: 0.05
@@ -727,7 +727,7 @@ const MAT = {
     color: C.cyan, transparent: true, opacity: 0.08
   }),
   pipe: new THREE.MeshLambertMaterial({
-    color: 0xe0f4fc, emissive: 0x87ceeb, emissiveIntensity: 0.1
+    color: 0xe0f4fc, emissive: 0x007ba7, emissiveIntensity: 0.1
   }),
 };
 
@@ -748,8 +748,8 @@ sunLight.shadow.camera.bottom = -80;
 sunLight.shadow.bias = -0.001;
 scene.add(sunLight);
 
-// Light sky blue fill light
-const cyanLight = new THREE.PointLight(0x87ceeb, 1.2, 80);
+// Dark sky blue fill light
+const cyanLight = new THREE.PointLight(0x007ba7, 1.2, 80);
 cyanLight.position.set(0, 20, 10);
 scene.add(cyanLight);
 
@@ -906,7 +906,7 @@ function buildUnderground() {
   return group;
 }
 
-// ── PARTICLE SYSTEM (Interactive Light Sky Blue Dust) ───────────
+// ── PARTICLE SYSTEM (Interactive Dark Sky Blue Dust) ───────────
 class ParticleSystem {
   constructor() {
     this.count = 250;
@@ -920,7 +920,7 @@ class ParticleSystem {
 
     this.geo.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
     this.mat = new THREE.PointsMaterial({
-      color: 0x87ceeb, // Light Sky Blue particles
+      color: 0x007ba7, // Dark Sky Blue particles
       size: 0.3,
       transparent: true, opacity: 0.6, 
       sizeAttenuation: true,
