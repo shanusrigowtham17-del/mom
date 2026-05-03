@@ -36,7 +36,9 @@ body {
 #three-canvas {
   position:fixed; top:0; left:0;
   width:100%; height:100%;
-  z-index:0; pointer-events:none;
+  z-index:0; 
+  /* Pointer events auto allows the canvas to receive drag and hover events */
+  pointer-events:auto; 
 }
 
 /* ── NAV ─────────────────────────────────────── */
@@ -48,6 +50,7 @@ nav {
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
   animation:slideDown .8s ease both;
+  pointer-events: auto;
 }
 @keyframes slideDown { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
 .nav-brand {
@@ -85,7 +88,13 @@ nav {
 .nav-cta:hover { background:var(--accent); transform:translateY(-1px); }
 
 /* ── SCROLL CONTAINER ───────────────────────── */
-#scroll-container { position:relative; z-index:10; }
+/* Make scroll container pointer-events:none so we can drag the 3D canvas underneath, 
+   but reset pointer-events:auto on the actual content cards */
+#scroll-container { position:relative; z-index:10; pointer-events:none; }
+.page-section { pointer-events:none; }
+.hero-content, .hero-scroll-hint, .marquee-wrap, .svc-grid, .exp-list, .about-split, .contact-split {
+  pointer-events:auto;
+}
 
 /* ── PAGE SECTIONS ──────────────────────────── */
 .page-section {
@@ -124,6 +133,7 @@ nav {
   font-weight:700; line-height:1.07;
   margin-bottom:1.6rem; color:var(--text-main);
   animation:fadeUp .8s .6s ease both;
+  pointer-events:none;
 }
 .hero-title em { font-style:italic; color:var(--accent); }
 .hero-sub {
@@ -320,6 +330,7 @@ footer {
   padding:2.5rem 4rem;
   display:flex; justify-content:space-between; align-items:center;
   flex-wrap:wrap; gap:1.5rem;
+  pointer-events: auto;
 }
 .ft-brand { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--text-main); }
 .ft-meta { font-size:.75rem; color:var(--text-muted); margin-top:3px; }
@@ -336,6 +347,7 @@ footer {
 .scene-indicator {
   position:fixed; right:2rem; top:50%; transform:translateY(-50%);
   z-index:500; display:flex; flex-direction:column; gap:.6rem;
+  pointer-events:auto;
 }
 .si-dot {
   width:6px; height:6px; border-radius:50%; border:1px solid var(--border-strong);
@@ -571,9 +583,10 @@ footer {
 <script>
 'use strict';
 /* ═══════════════════════════════════════════════════════════
-   SAI MEGHANA — MINIMAL 3D BACKGROUND ENGINE
+   SAI MEGHANA — INTERACTIVE 3D BACKGROUND ENGINE
    Architecture: Three.js r128
    Theme: High Contrast Monochrome (White Ground, Black/Grey Details)
+   Interaction: Desktop Hover Raycasting, Drag to Orbit, Particle Repulsion
 ═══════════════════════════════════════════════════════════ */
 
 // ── CORE SETUP ──────────────────────────────────────────
@@ -587,7 +600,6 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 
 const scene = new THREE.Scene();
-// Keep the fog white to maintain the UI background theme
 scene.fog = new THREE.FogExp2(0xffffff, 0.012);
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
@@ -599,8 +611,10 @@ const state = {
   scroll: 0,
   section: 'home',
   sectionProgress: 0,
-  mouse: new THREE.Vector2(),
-  targetMouse: new THREE.Vector2(),
+  mouse: new THREE.Vector2(0, 0),
+  targetMouse: new THREE.Vector2(0, 0),
+  dragOffset: { x: 0, y: 0 },
+  isDragging: false,
   time: 0,
   fps: 60,
   lastTime: 0,
@@ -610,26 +624,25 @@ const state = {
   cameraTarget: new THREE.Vector3(0, 14, 52),
 };
 
+const raycaster = new THREE.Raycaster();
+
 // ── MINIMAL DARK 3D PALETTE ──────────────────────────────
 const C = {
-  ground: new THREE.Color(0xffffff), // Base remains white for fog blending
+  ground: new THREE.Color(0xffffff),
 };
 
 // ── MATERIALS (Dark Grey & Black Profiles) ────────────────
 const MAT = {
-  // Pure black pencil/wireframe lines
   blueprint: new THREE.MeshBasicMaterial({
     color: 0x000000, wireframe: true, transparent: true, opacity: 0.15
   }),
   blueprintGlow: new THREE.LineBasicMaterial({
     color: 0x000000, transparent: true, opacity: 0.25
   }),
-  // Translucent dark grey for assembly phase
   assembly: new THREE.MeshLambertMaterial({
     color: 0x555555, transparent: true, opacity: 0.8,
     emissive: 0x222222, emissiveIntensity: 0.1
   }),
-  // Solid sleek dark grey/black for finished structures
   solid: new THREE.MeshLambertMaterial({
     color: 0x2a2a2a,
     emissive: 0x000000, emissiveIntensity: 0.0
@@ -640,9 +653,6 @@ const MAT = {
   }),
   pipe: new THREE.MeshLambertMaterial({
     color: 0x444444, emissive: 0x111111, emissiveIntensity: 0.1
-  }),
-  glowCore: new THREE.MeshBasicMaterial({
-    color: 0x111111, transparent: true, opacity: 0.5
   }),
 };
 
@@ -663,7 +673,6 @@ sunLight.shadow.camera.bottom = -80;
 sunLight.shadow.bias = -0.001;
 scene.add(sunLight);
 
-// Soft fill light
 const goldLight = new THREE.PointLight(0xffffff, 1.0, 80);
 goldLight.position.set(0, 20, 10);
 scene.add(goldLight);
@@ -677,14 +686,12 @@ function buildGrid() {
   const group = new THREE.Group();
   const size = 120, step = 6;
 
-  // Ground plane
   const groundGeo = new THREE.PlaneGeometry(size, size);
   const ground = new THREE.Mesh(groundGeo, MAT.ground);
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
   group.add(ground);
 
-  // Grid lines
   for (let i = -size/2; i <= size/2; i += step) {
     const hGeo = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(-size/2, 0.02, i),
@@ -698,7 +705,6 @@ function buildGrid() {
     group.add(new THREE.Line(vGeo, MAT.gridLine));
   }
 
-  // Axis highlight lines
   const axisGeo = new THREE.BufferGeometry().setFromPoints([
     new THREE.Vector3(-size/2, 0.04, 0),
     new THREE.Vector3(size/2, 0.04, 0)
@@ -714,7 +720,7 @@ function buildGrid() {
 // ── BUILDING FACTORY ─────────────────────────────────────
 function createBuilding(w, h, d, x, z, layer = 1) {
   const group = new THREE.Group();
-  group.userData = { layer, buildState: 0, x, z };
+  group.userData = { layer, buildState: 0, x, z, isHovered: false };
 
   const geo = new THREE.BoxGeometry(w, h, d);
 
@@ -781,7 +787,7 @@ function createFrame(w, h, d, x, z) {
 // ── SILO / CHIMNEY ───────────────────────────────────────
 function createSilo(r, h, x, z) {
   const group = new THREE.Group();
-  group.userData = { layer: 1, buildState: 0 };
+  group.userData = { layer: 1, buildState: 0, isHovered: false };
 
   const geo = new THREE.CylinderGeometry(r, r * 1.1, h, 12);
   const bp = new THREE.Mesh(geo, MAT.blueprint.clone());
@@ -824,10 +830,10 @@ function buildUnderground() {
   return group;
 }
 
-// ── PARTICLE SYSTEM (Construction Dust) ───────────
+// ── PARTICLE SYSTEM (Interactive Dark Dust) ───────────
 class ParticleSystem {
   constructor() {
-    this.count = 200;
+    this.count = 250;
     this.geo = new THREE.BufferGeometry();
     this.positions = new Float32Array(this.count * 3);
     this.velocities = new Float32Array(this.count * 3);
@@ -838,14 +844,13 @@ class ParticleSystem {
 
     this.geo.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
     this.mat = new THREE.PointsMaterial({
-      color: 0x111111, size: 0.2, // Dark particles
-      transparent: true, opacity: 0.4,
+      color: 0x000000, size: 0.25, // Much darker and slightly larger
+      transparent: true, opacity: 0.8, // Highly visible against white
       sizeAttenuation: true,
       blending: THREE.NormalBlending,
       depthWrite: false
     });
     this.points = new THREE.Points(this.geo, this.mat);
-    this.active = false;
   }
 
   spawn(i) {
@@ -860,17 +865,38 @@ class ParticleSystem {
     this.maxAges[i] = 80 + Math.random() * 120;
   }
 
-  update(intensity = 1.0) {
+  update(intensity = 1.0, mouseX, mouseY) {
+    // Map normalized mouse (-1 to 1) roughly to world plane bounds for repulsion
+    let worldMouseX = mouseX * 30;
+    let worldMouseY = -mouseY * 30; // Inverse Y for 3D translation
+    
     for (let i = 0; i < this.count; i++) {
       this.ages[i]++;
       if (this.ages[i] > this.maxAges[i]) { this.spawn(i); continue; }
+      
+      // Basic movement
       this.positions[i*3]   += this.velocities[i*3];
       this.positions[i*3+1] += this.velocities[i*3+1];
       this.positions[i*3+2] += this.velocities[i*3+2];
-      this.velocities[i*3+1] -= 0.0004;
+      this.velocities[i*3+1] -= 0.0004; // Gravity
+      
+      // Interactive Repulsion (Push particles away from mouse)
+      let dx = this.positions[i*3] - worldMouseX;
+      let dy = this.positions[i*3+1] - worldMouseY; // approximate Z mapping to Y for simplicity
+      let distSq = dx*dx + dy*dy;
+      
+      if (distSq < 150) {
+          this.velocities[i*3] += dx * 0.0008;
+          this.velocities[i*3+1] += dy * 0.0008; // Pushes them UP/DOWN slightly
+          this.velocities[i*3+2] += dy * 0.0008; // Pushes them in Z
+      }
+      
+      // Drag Dampening
+      this.velocities[i*3] *= 0.98;
+      this.velocities[i*3+2] *= 0.98;
     }
     this.geo.attributes.position.needsUpdate = true;
-    this.mat.opacity = 0.4 * intensity; 
+    this.mat.opacity = 0.8 * intensity; 
   }
 }
 
@@ -924,7 +950,9 @@ const SECTION_STATES = {
   contact:   { camPos: [0, 20, 16],  camLook: [0, 0, -10], buildState: 1.0,  lightIntensity: 1.2,  label: 'Complete — Industrial Campus Built' },
 };
 
-// ── BUILD STATE APPLIER ──────────────────────────────────
+// ── BUILD STATE APPLIER (With Hover Logic) ───────────────
+function lerp(a, b, t) { return a + (b - a) * t; }
+
 function applyBuildState(group, progress) {
   group.children.forEach(obj => {
     if (!obj.userData?.buildState !== undefined) return;
@@ -935,19 +963,29 @@ function applyBuildState(group, progress) {
       const localProg = Math.max(0, Math.min(1, (progress - layerOffset) / 0.8));
 
       obj.scale.y = 0.05 + localProg * 0.95;
+      
+      // Interactive Hover Scale
+      const targetScaleXZ = obj.userData.isHovered ? 1.05 : 1.0;
+      if(obj.scale.x === undefined) obj.scale.x = 1;
+      obj.scale.x = lerp(obj.scale.x, targetScaleXZ, 0.1);
+      obj.scale.z = obj.scale.x;
 
       obj.children.forEach(mesh => {
         if (!mesh.userData?.type) return;
         const t = mesh.userData.type;
         if (t === 'blueprint') {
           mesh.visible = localProg < 0.5;
-          if (mesh.material) mesh.material.opacity = (0.5 - localProg) * 0.3; // Increased visibility for black wires
+          if (mesh.material) mesh.material.opacity = (0.5 - localProg) * 0.3;
         } else if (t === 'assembly') {
           mesh.visible = localProg >= 0.3 && localProg < 0.85;
           if (mesh.material) mesh.material.opacity = Math.sin(localProg * Math.PI) * 0.85;
         } else if (t === 'solid') {
           mesh.visible = localProg >= 0.7;
-          if (mesh.material) mesh.material.opacity = Math.min(1, (localProg - 0.7) / 0.3);
+          if (mesh.material) {
+             mesh.material.opacity = Math.min(1, (localProg - 0.7) / 0.3);
+             // Highlight emissive slightly on hover
+             mesh.material.emissiveIntensity = obj.userData.isHovered ? 0.2 : 0.0;
+          }
         }
       });
     }
@@ -955,9 +993,17 @@ function applyBuildState(group, progress) {
     if (obj.type === 'Group' && obj.children.length === 2) {
       const localProg = Math.max(0, Math.min(1, progress));
       obj.scale.y = 0.02 + localProg * 0.98;
+      
+      const targetScaleXZ = obj.userData.isHovered ? 1.05 : 1.0;
+      obj.scale.x = lerp(obj.scale.x, targetScaleXZ, 0.1);
+      obj.scale.z = obj.scale.x;
+      
       const [bp, solid] = obj.children;
       if (bp?.material) { bp.material.opacity = (1 - localProg) * 0.2; bp.visible = localProg < 0.8; }
-      if (solid) { solid.visible = localProg > 0.6; }
+      if (solid) { 
+          solid.visible = localProg > 0.6; 
+          solid.material.emissiveIntensity = obj.userData.isHovered ? 0.2 : 0.0;
+      }
     }
   });
 }
@@ -980,7 +1026,46 @@ function applyFrameState(progress) {
   });
 }
 
-// ── SECTION DETECTION ────────────────────────────────────
+// ── INTERACTION HANDLERS (Drag / Swipe / Hover) ───────────
+let previousMousePosition = { x: 0, y: 0 };
+
+function handleMove(clientX, clientY) {
+  state.targetMouse.x = (clientX / window.innerWidth  - 0.5) * 2;
+  state.targetMouse.y = (clientY / window.innerHeight - 0.5) * 2;
+}
+
+// Desktop Mouse
+window.addEventListener('mousedown', (e) => {
+    state.isDragging = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+window.addEventListener('mouseup', () => state.isDragging = false);
+window.addEventListener('mousemove', (e) => {
+    handleMove(e.clientX, e.clientY);
+    if (state.isDragging) {
+        const deltaX = e.clientX - previousMousePosition.x;
+        state.dragOffset.x -= deltaX * 0.005; // Negative to drag opposite way
+    }
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+
+// Mobile Touch
+window.addEventListener('touchstart', (e) => {
+    state.isDragging = true;
+    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, {passive: true});
+window.addEventListener('touchend', () => state.isDragging = false);
+window.addEventListener('touchmove', (e) => {
+    handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    if (state.isDragging) {
+        const deltaX = e.touches[0].clientX - previousMousePosition.x;
+        state.dragOffset.x -= deltaX * 0.008; 
+    }
+    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, {passive: true});
+
+
+// ── SCROLL DETECTION ─────────────────────────────────────
 function getCurrentSection() {
   const sections = document.querySelectorAll('[data-scene]');
   let current = 'home';
@@ -993,21 +1078,12 @@ function getCurrentSection() {
   return current;
 }
 
-// ── SCROLL HANDLER ───────────────────────────────────────
-let lastScroll = 0;
 function onScroll() {
   const total = document.body.scrollHeight - window.innerHeight;
   state.scroll = Math.max(0, Math.min(1, window.scrollY / total));
   state.section = getCurrentSection();
-  lastScroll = window.scrollY;
 }
 window.addEventListener('scroll', onScroll, { passive: true });
-
-// ── MOUSE HANDLER ────────────────────────────────────────
-document.addEventListener('mousemove', e => {
-  state.targetMouse.x = (e.clientX / window.innerWidth  - 0.5) * 2;
-  state.targetMouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
-});
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -1046,8 +1122,6 @@ siDots.forEach(dot => {
     document.getElementById(dot.dataset.target)?.scrollIntoView({ behavior:'smooth' });
   });
 });
-
-function lerp(a, b, t) { return a + (b - a) * t; }
 
 const camPositions = {
   home:      new THREE.Vector3(0, 14, 52),
@@ -1089,8 +1163,9 @@ function animate(now = 0) {
     fpsFrames = 0; fpsAccum = 0;
   }
 
-  state.mouse.x = lerp(state.mouse.x, state.targetMouse.x, 0.06);
-  state.mouse.y = lerp(state.mouse.y, state.targetMouse.y, 0.06);
+  // Smooth mouse
+  state.mouse.x = lerp(state.mouse.x, state.targetMouse.x, 0.08);
+  state.mouse.y = lerp(state.mouse.y, state.targetMouse.y, 0.08);
 
   const sec = state.section;
   const ss = SECTION_STATES[sec] || SECTION_STATES.home;
@@ -1102,13 +1177,29 @@ function animate(now = 0) {
   currentCamLook.lerp(targetLook, 0.025);
 
   camMouseOffset.set(
-    state.mouse.x * 3.5,
-    -state.mouse.y * 2,
+    state.mouse.x * 4.0,
+    -state.mouse.y * 2.5,
     0
   );
 
   camera.position.copy(currentCamPos).add(camMouseOffset);
   camera.lookAt(currentCamLook);
+  
+  // ── RAYCASTING (HOVER EFFECT) ──
+  raycaster.setFromCamera(state.mouse, camera);
+  
+  // Reset all hovers
+  sceneGroups.buildings.children.forEach(b => b.userData.isHovered = false);
+  sceneGroups.silos.children.forEach(s => s.userData.isHovered = false);
+  
+  const intersects = raycaster.intersectObjects([...sceneGroups.buildings.children, ...sceneGroups.silos.children], true);
+  if (intersects.length > 0) {
+      let obj = intersects[0].object;
+      while(obj.parent && obj.parent !== sceneGroups.buildings && obj.parent !== sceneGroups.silos) {
+          obj = obj.parent;
+      }
+      if (obj.userData !== undefined) obj.userData.isHovered = true;
+  }
 
   const buildProg = ss.buildState;
 
@@ -1128,7 +1219,8 @@ function animate(now = 0) {
   });
 
   const particleIntensity = Math.max(0, 1 - Math.abs(buildProg - 0.5) * 3);
-  sceneGroups.particles.update(particleIntensity);
+  // Pass mouse state to particle system for repulsion effect
+  sceneGroups.particles.update(particleIntensity, state.mouse.x, state.mouse.y);
 
   sceneGroups.terrain.children.forEach(child => {
     if (child instanceof THREE.Line) {
@@ -1139,10 +1231,18 @@ function animate(now = 0) {
     }
   });
 
+  // Slowly return drag offset back to 0 when not dragging
+  if (!state.isDragging) {
+      state.dragOffset.x = lerp(state.dragOffset.x, 0, 0.02);
+  }
+
+  // Base rotation from mouse + Manual Drag rotation
+  let targetRotationY = (state.mouse.x * 0.05) + state.dragOffset.x;
+  
   sceneGroups.buildings.rotation.y = lerp(
     sceneGroups.buildings.rotation.y,
-    state.mouse.x * 0.04,
-    0.03
+    targetRotationY,
+    0.08
   );
   sceneGroups.frames.rotation.y = sceneGroups.buildings.rotation.y;
   sceneGroups.silos.rotation.y  = sceneGroups.buildings.rotation.y;
