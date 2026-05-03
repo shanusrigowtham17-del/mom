@@ -10,8 +10,8 @@
 /* ── RESET & ROOT ─────────────────────────────── */
 :root {
   --bg-main: #ffffff;
-  --bg-alt: #f7f7f7;
-  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-alt: #efefef; /* Slightly darker grey for contrast */
+  --bg-glass: rgba(248, 248, 248, 0.88); /* Slightly darker frosted glass */
   
   --text-main: #111111;
   --text-muted: #737373;
@@ -162,7 +162,7 @@ nav {
 
 /* ── SECTION STYLES ──────────────────────────── */
 .sec-bg-dark { background:var(--bg-glass); }
-.sec-bg-mid  { background:rgba(247,247,247,0.85); }
+.sec-bg-mid  { background:rgba(239,239,239,0.85); } /* Slightly darker mid bg */
 .sec-label {
   font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
   color:var(--text-light); font-weight:600; margin-bottom:.7rem;
@@ -843,8 +843,8 @@ class ParticleSystem {
 
     this.geo.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
     this.mat = new THREE.PointsMaterial({
-      color: 0x555555, size: 0.2,
-      transparent: true, opacity: 0.15,
+      color: 0x111111, size: 0.2, // Darkened particle color
+      transparent: true, opacity: 0.3, // Increased opacity
       sizeAttenuation: true,
       blending: THREE.NormalBlending,
       depthWrite: false
@@ -875,7 +875,7 @@ class ParticleSystem {
       this.velocities[i*3+1] -= 0.0004;
     }
     this.geo.attributes.position.needsUpdate = true;
-    this.mat.opacity = 0.15 * intensity;
+    this.mat.opacity = 0.3 * intensity; // Adjusted max opacity mapping
   }
 }
 
@@ -1134,7 +1134,9 @@ function animate(now = 0) {
 
   const particleIntensity = Math.max(0, 1 - Math.abs(buildProg - 0.5) * 3);
   sceneGroups.particles.update(particleIntensity);
-  sceneGroups.particles.mat.opacity = particleIntensity * 0.15;
+  
+  // Opacity update moved into update() function for smoother logic, kept local assignment to prevent overriding
+  // sceneGroups.particles.mat.opacity = particleIntensity * 0.3;
 
   sceneGroups.terrain.children.forEach(child => {
     if (child instanceof THREE.Line) {
