@@ -4,24 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sai Meghana Technical Consultants LLP — Engineering Excellence</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 /* ── RESET & ROOT ─────────────────────────────── */
 :root {
+  /* Clean white and light blue-grey backgrounds */
   --bg-main: #ffffff;
-  --bg-alt: #efefef;
-  --bg-glass: rgba(248, 248, 248, 0.88);
+  --bg-alt: #f0f4f8; 
+  --bg-glass: rgba(255, 255, 255, 0.92);
   
-  --text-main: #111111;
-  --text-muted: #737373;
-  --text-light: #999999;
+  /* Text colors matching the deep navy of the logo */
+  --text-main: #001229;
+  --text-muted: #4a5d73;
+  --text-light: #8b9eb3;
   
-  --accent: #b4a072;
-  --accent-hover: #9c895d;
+  /* Theme Accents derived from the logo gradient */
+  --accent-cyan: #00adef;
+  --accent-navy: #002147;
+  --gradient-primary: linear-gradient(135deg, #00adef, #004d99);
   
-  --border: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.15);
+  --border: rgba(0, 173, 239, 0.15);
+  --border-strong: rgba(0, 173, 239, 0.35);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -37,14 +41,13 @@ body {
   position:fixed; top:0; left:0;
   width:100%; height:100%;
   z-index:0; 
-  /* Pointer events auto allows the canvas to receive drag and hover events */
   pointer-events:auto; 
 }
 
-/* ── NAV ─────────────────────────────────────── */
+/* ── NAV & LOGO ──────────────────────────────── */
 nav {
   position:fixed; top:0; left:0; right:0; z-index:1000;
-  padding:1.1rem 4rem;
+  padding:1rem 4rem;
   display:flex; align-items:center; justify-content:space-between;
   background:var(--bg-glass);
   backdrop-filter:blur(20px);
@@ -53,43 +56,71 @@ nav {
   pointer-events: auto;
 }
 @keyframes slideDown { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
+
 .nav-brand {
-  font-family:'Playfair Display',serif;
-  font-size:1.05rem; font-weight:700; color:var(--text-main);
-  letter-spacing:.03em; text-decoration:none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: var(--text-main);
+  transition: opacity 0.3s ease;
 }
-.nav-brand span {
-  display:block; font-family:'DM Sans',sans-serif;
-  font-size:.65rem; font-weight:400; color:var(--text-muted);
-  letter-spacing:.14em; text-transform:uppercase; margin-top:2px;
+.nav-brand:hover {
+  opacity: 0.8;
 }
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+}
+.brand-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.brand-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.brand-text span {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  margin-top: 6px;
+}
+
 .nav-links { display:flex; gap:2.5rem; }
 .nav-links a {
   text-decoration:none; color:var(--text-muted);
-  font-size:.82rem; font-weight:500;
+  font-size:.82rem; font-weight:600;
   letter-spacing:.07em; text-transform:uppercase;
   transition:color .3s; position:relative;
 }
 .nav-links a::after {
   content:''; position:absolute; bottom:-4px; left:0; right:0;
-  height:1px; background:var(--text-main);
+  height:2px; background:var(--accent-cyan);
   transform:scaleX(0); transition:transform .35s;
 }
-.nav-links a:hover, .nav-links a.active { color:var(--text-main); }
+.nav-links a:hover, .nav-links a.active { color:var(--accent-navy); }
 .nav-links a:hover::after, .nav-links a.active::after { transform:scaleX(1); }
 .nav-cta {
-  background:var(--text-main); color:var(--bg-main);
-  padding:.52rem 1.4rem; border-radius:2px;
+  background:var(--gradient-primary); color:var(--bg-main);
+  padding:.52rem 1.4rem; border-radius:3px;
   text-decoration:none; font-size:.8rem; font-weight:700;
   letter-spacing:.07em; text-transform:uppercase;
-  transition:background .3s,transform .2s;
+  transition:box-shadow .3s,transform .2s;
   position:relative; overflow:hidden;
 }
-.nav-cta:hover { background:var(--accent); transform:translateY(-1px); }
+.nav-cta:hover { transform:translateY(-1px); box-shadow: 0 8px 20px rgba(0, 173, 239, 0.25); }
 
 /* ── SCROLL CONTAINER ───────────────────────── */
-/* Make scroll container pointer-events:none so we can drag the 3D canvas underneath, 
-   but reset pointer-events:auto on the actual content cards */
 #scroll-container { position:relative; z-index:10; pointer-events:none; }
 .page-section { pointer-events:none; }
 .hero-content, .hero-scroll-hint, .marquee-wrap, .svc-grid, .exp-list, .about-split, .contact-split {
@@ -103,28 +134,24 @@ nav {
   padding:7rem 4rem 5rem;
   position:relative;
 }
-.page-section::before {
-  content:''; position:absolute; inset:0;
-  pointer-events:none;
-}
 
 /* ── HERO ────────────────────────────────────── */
 #sec-home {
   min-height:100vh;
-  background:linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,.6) 60%, rgba(255,255,255,1) 100%);
+  background:linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,.7) 60%, rgba(255,255,255,1) 100%);
 }
 .hero-content { max-width:680px; }
 .hero-badge {
   display:inline-flex; align-items:center; gap:8px;
-  padding:.38rem 1rem; border:1px solid var(--border-strong); border-radius:2px;
-  margin-bottom:2rem; font-size:.72rem; font-weight:500;
-  letter-spacing:.14em; text-transform:uppercase; color:var(--text-main);
+  padding:.38rem 1rem; border:1px solid var(--border-strong); border-radius:3px;
+  margin-bottom:2rem; font-size:.72rem; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--accent-navy);
   background:var(--bg-glass);
   animation:fadeUp .8s .4s ease both;
 }
 .hero-badge::before {
   content:''; width:5px; height:5px; border-radius:50%;
-  background:var(--accent); animation:blink 2s infinite;
+  background:var(--accent-cyan); animation:blink 2s infinite;
 }
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
 .hero-title {
@@ -135,63 +162,61 @@ nav {
   animation:fadeUp .8s .6s ease both;
   pointer-events:none;
 }
-.hero-title em { font-style:italic; color:var(--accent); }
+.hero-title em { font-style:italic; color:var(--accent-cyan); }
 .hero-sub {
   font-size:1.05rem; color:var(--text-muted); line-height:1.8;
   max-width:480px; margin-bottom:3rem;
   animation:fadeUp .8s .8s ease both;
 }
 .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; animation:fadeUp .8s 1s ease both; }
-.btn-gold {
+.btn-primary {
   display:inline-flex; align-items:center; gap:8px;
-  background:var(--text-main); color:var(--bg-main);
-  padding:.9rem 2.2rem; border-radius:2px;
+  background:var(--gradient-primary); color:var(--bg-main);
+  padding:.9rem 2.2rem; border-radius:3px;
   text-decoration:none; font-weight:700; font-size:.88rem;
   letter-spacing:.05em; transition:all .3s;
 }
-.btn-gold:hover { background:var(--accent); transform:translateY(-2px); box-shadow:0 16px 40px rgba(180,160,114,.2); }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(0, 173, 239, 0.25); }
 .btn-outline {
   display:inline-flex; align-items:center; gap:8px;
-  border:1px solid var(--border-strong); color:var(--text-main);
-  padding:.9rem 2.2rem; border-radius:2px; background:var(--bg-glass);
-  text-decoration:none; font-size:.88rem; transition:all .3s;
+  border:1px solid var(--accent-cyan); color:var(--accent-navy);
+  padding:.9rem 2.2rem; border-radius:3px; background:var(--bg-glass);
+  text-decoration:none; font-weight:600; font-size:.88rem; transition:all .3s;
 }
-.btn-outline:hover { border-color:var(--text-main); transform:translateY(-2px); }
+.btn-outline:hover { background:var(--accent-cyan); color:var(--bg-main); transform:translateY(-2px); }
 .hero-scroll-hint {
   position:absolute; bottom:3rem; left:50%; transform:translateX(-50%);
   display:flex; flex-direction:column; align-items:center; gap:.6rem;
   animation:fadeUp .8s 1.4s ease both;
 }
 .scroll-line {
-  width:1px; height:60px; background:linear-gradient(to bottom,var(--text-main),transparent);
+  width:1px; height:60px; background:linear-gradient(to bottom,var(--accent-cyan),transparent);
   animation:scrollPulse 2s ease-in-out infinite;
 }
 @keyframes scrollPulse{0%,100%{opacity:.2;transform:scaleY(.8)}50%{opacity:1;transform:scaleY(1)}}
-.scroll-label { font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--text-light); }
+.scroll-label { font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent-navy); font-weight: 600;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── SECTION STYLES ──────────────────────────── */
 .sec-bg-dark { background:var(--bg-glass); }
-.sec-bg-mid  { background:rgba(239,239,239,0.85); }
+.sec-bg-mid  { background:rgba(240,244,248,0.85); }
 .sec-label {
   font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
-  color:var(--text-light); font-weight:600; margin-bottom:.7rem;
+  color:var(--accent-cyan); font-weight:700; margin-bottom:.7rem;
 }
 .sec-title {
   font-family:'Playfair Display',serif;
   font-size:clamp(2rem,3.5vw,3rem);
   font-weight:700; line-height:1.15; margin-bottom:1.2rem; color:var(--text-main);
 }
-.sec-title em { font-style:italic; color:var(--accent); }
+.sec-title em { font-style:italic; color:var(--accent-cyan); }
 .sec-desc { color:var(--text-muted); font-size:.96rem; line-height:1.8; max-width:520px; }
 
 /* ── MARQUEE ──────────────────────────────────── */
 .marquee-wrap {
   position:relative; z-index:50;
-  background:var(--bg-alt); overflow:hidden;
+  background:var(--gradient-primary); overflow:hidden;
   padding:1rem 0; white-space:nowrap;
-  border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
 }
 .marquee-track {
   display:inline-flex;
@@ -199,9 +224,9 @@ nav {
 }
 .marquee-track span {
   font-size:.75rem; font-weight:700; letter-spacing:.14em;
-  text-transform:uppercase; color:var(--text-main); padding:0 2.5rem;
+  text-transform:uppercase; color:var(--bg-main); padding:0 2.5rem;
 }
-.marquee-track span::after { content:'◆'; margin-left:2.5rem; opacity:.15; }
+.marquee-track span::after { content:'◆'; margin-left:2.5rem; opacity:.3; }
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* ── SERVICES GRID ────────────────────────────── */
@@ -220,21 +245,21 @@ nav {
 }
 .svc-card::before {
   content:''; position:absolute; top:0; left:0;
-  width:3px; height:0; background:var(--accent);
+  width:3px; height:0; background:var(--accent-cyan);
   transition:height .5s ease;
 }
 .svc-card:hover { background:var(--bg-alt); }
 .svc-card:hover::before { height:100%; }
-.svc-icon { font-size:1.5rem; margin-bottom:1.2rem; filter: grayscale(100%); opacity: 0.8;}
+.svc-icon { font-size:1.5rem; margin-bottom:1.2rem; filter: sepia(100%) hue-rotate(180deg) saturate(300%); opacity: 0.8;}
 .svc-name {
   font-family:'Playfair Display',serif;
-  font-size:1.05rem; font-weight:600; margin-bottom:.6rem; line-height:1.3;
+  font-size:1.05rem; font-weight:600; margin-bottom:.6rem; line-height:1.3; color: var(--accent-navy);
 }
 .svc-desc { font-size:.85rem; color:var(--text-muted); line-height:1.7; }
 .svc-tag {
   display:inline-block; margin-top:1rem;
-  font-size:.68rem; color:var(--text-main); letter-spacing:.1em;
-  text-transform:uppercase; font-weight:600; opacity: 0.6;
+  font-size:.68rem; color:var(--accent-cyan); letter-spacing:.1em;
+  text-transform:uppercase; font-weight:700;
 }
 
 /* ── EXPERTISE LIST ───────────────────────────── */
@@ -249,94 +274,94 @@ nav {
 }
 .exp-item::before {
   content:''; position:absolute; top:0; left:0; bottom:0;
-  width:3px; background:var(--accent);
+  width:3px; background:var(--gradient-primary);
   transform:scaleY(0); transition:transform .4s; transform-origin:bottom;
 }
 .exp-item:hover { background:var(--bg-alt); }
 .exp-item:hover::before { transform:scaleY(1); }
 .exp-n { font-family:'Playfair Display',serif; font-size:.85rem; color:var(--text-light); font-weight:700; }
-.exp-item:hover .exp-n { color:var(--text-main); }
-.exp-title { font-size:.95rem; font-weight:600; color:var(--text-main); }
+.exp-item:hover .exp-n { color:var(--accent-cyan); }
+.exp-title { font-size:.95rem; font-weight:600; color:var(--accent-navy); }
 .exp-badge {
   padding:.28rem .8rem; border:1px solid var(--border-strong); border-radius:2px;
-  font-size:.68rem; color:var(--text-main); letter-spacing:.08em; text-transform:uppercase;
-  white-space:nowrap; background:var(--bg-alt);
+  font-size:.68rem; color:var(--accent-navy); letter-spacing:.08em; text-transform:uppercase;
+  white-space:nowrap; background:var(--bg-alt); font-weight:600;
 }
 
 /* ── ABOUT SPLIT ─────────────────────────────── */
 .about-split { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
 .about-facts { display:flex; gap:2.5rem; margin-top:2rem; flex-wrap:wrap; }
-.fact { border-left:2px solid var(--border-strong); padding-left:1rem; }
-.fact-val { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:var(--text-main); }
-.fact-label { font-size:.75rem; color:var(--text-muted); margin-top:2px; letter-spacing:.04em; }
+.fact { border-left:2px solid var(--accent-cyan); padding-left:1rem; }
+.fact-val { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:var(--accent-navy); }
+.fact-label { font-size:.75rem; color:var(--text-muted); margin-top:2px; letter-spacing:.04em; font-weight:600;}
 .about-legal {
-  border:1px solid var(--border); border-radius:2px;
+  border:1px solid var(--border); border-radius:3px;
   padding:2rem; margin-top:2rem; background:var(--bg-main);
   display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;
 }
-.legal-item-label { font-size:.68rem; color:var(--text-light); letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem; }
-.legal-item-val { font-size:.92rem; font-weight:500; }
+.legal-item-label { font-size:.68rem; color:var(--accent-cyan); letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem; font-weight:700;}
+.legal-item-val { font-size:.92rem; font-weight:500; color:var(--accent-navy); }
 
 /* ── CONTACT SECTION ─────────────────────────── */
 .contact-split { display:grid; grid-template-columns:1fr 1.3fr; gap:5rem; align-items:start; }
 .contact-cards { display:flex; flex-direction:column; gap:.8rem; margin-top:1.5rem; }
 .cc {
   display:flex; align-items:center; gap:1rem;
-  padding:1.1rem 1.4rem; border:1px solid var(--border); border-radius:2px; background:var(--bg-main);
+  padding:1.1rem 1.4rem; border:1px solid var(--border); border-radius:3px; background:var(--bg-main);
   text-decoration:none; color:var(--text-main); transition:all .3s;
   position:relative; overflow:hidden;
 }
 .cc::after { content:''; position:absolute; inset:0; background:var(--bg-alt); transform:translateX(-100%); transition:transform .3s; }
-.cc:hover { border-color:var(--text-main); }
+.cc:hover { border-color:var(--accent-cyan); }
 .cc:hover::after { transform:translateX(0); }
 .cc-icon {
   width:42px; height:42px; background:var(--bg-alt); border:1px solid var(--border);
-  border-radius:2px; display:flex; align-items:center; justify-content:center; filter: grayscale(100%); opacity: 0.8;
-  font-size:1.1rem; flex-shrink:0; position:relative; z-index:1;
+  border-radius:3px; display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; flex-shrink:0; position:relative; z-index:1; color: var(--accent-cyan);
 }
 .cc-text { position:relative; z-index:1; }
-.cc-lbl { font-size:.68rem; color:var(--text-light); letter-spacing:.1em; text-transform:uppercase; }
-.cc-val { font-size:.95rem; font-weight:600; margin-top:2px; }
+.cc-lbl { font-size:.68rem; color:var(--text-light); letter-spacing:.1em; text-transform:uppercase; font-weight:600;}
+.cc-val { font-size:.95rem; font-weight:600; margin-top:2px; color:var(--accent-navy); }
 .form-wrap {
   background:var(--bg-main); border:1px solid var(--border);
-  border-radius:2px; padding:2.8rem; box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+  border-radius:3px; padding:2.8rem; box-shadow: 0 10px 40px rgba(0,173,239,0.05);
 }
-.form-wrap h3 { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; margin-bottom:.4rem; }
+.form-wrap h3 { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; margin-bottom:.4rem; color:var(--accent-navy);}
 .form-wrap p { font-size:.87rem; color:var(--text-muted); margin-bottom:2rem; }
 .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
 .fg { display:flex; flex-direction:column; gap:.4rem; margin-bottom:1rem; }
-.fg label { font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-light); font-weight:600; }
+.fg label { font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-light); font-weight:700; }
 .fg input, .fg select, .fg textarea {
   background:var(--bg-alt); border:1px solid var(--border);
-  color:var(--text-main); padding:.82rem 1rem; border-radius:2px;
+  color:var(--text-main); padding:.82rem 1rem; border-radius:3px;
   font-family:'DM Sans',sans-serif; font-size:.92rem;
   transition:all .3s; outline:none; resize:none; width:100%;
 }
 .fg input::placeholder, .fg textarea::placeholder { color:var(--text-light); }
-.fg input:focus, .fg select:focus, .fg textarea:focus { border-color:var(--text-main); background:var(--bg-main); }
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color:var(--accent-cyan); background:var(--bg-main); box-shadow: 0 0 0 3px rgba(0,173,239,0.1);}
 .submit-btn {
-  width:100%; background:var(--text-main); color:var(--bg-main);
-  padding:1rem; border:none; border-radius:2px;
+  width:100%; background:var(--gradient-primary); color:var(--bg-main);
+  padding:1rem; border:none; border-radius:3px;
   font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:700;
   letter-spacing:.07em; text-transform:uppercase;
   cursor:pointer; transition:all .3s; margin-top:.5rem;
 }
-.submit-btn:hover { background:var(--accent); transform:translateY(-1px); }
+.submit-btn:hover { box-shadow:0 8px 25px rgba(0, 173, 239, 0.3); transform:translateY(-1px); }
 
 /* ── FOOTER ──────────────────────────────────── */
 footer {
   position:relative; z-index:50;
-  background:var(--bg-main); border-top:1px solid var(--border);
-  padding:2.5rem 4rem;
+  background:var(--accent-navy); border-top:1px solid var(--border);
+  padding:2.5rem 4rem; color:var(--bg-main);
   display:flex; justify-content:space-between; align-items:center;
   flex-wrap:wrap; gap:1.5rem;
   pointer-events: auto;
 }
-.ft-brand { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--text-main); }
-.ft-meta { font-size:.75rem; color:var(--text-muted); margin-top:3px; }
+.ft-brand { font-family:'DM Sans',sans-serif; font-size:1.1rem; font-weight:600; color:var(--bg-main); letter-spacing:0.05em;}
+.ft-meta { font-size:.75rem; color:var(--text-light); margin-top:5px; }
 .ft-links { display:flex; gap:2rem; }
-.ft-links a { font-size:.75rem; color:var(--text-muted); text-decoration:none; text-transform:uppercase; letter-spacing:.08em; transition:color .3s; }
-.ft-links a:hover { color:var(--text-main); }
+.ft-links a { font-size:.75rem; color:var(--text-light); text-decoration:none; text-transform:uppercase; letter-spacing:.08em; transition:color .3s; font-weight:600;}
+.ft-links a:hover { color:var(--accent-cyan); }
 .ft-copy { font-size:.73rem; color:var(--text-light); }
 
 /* ── REVEAL ANIMATION ────────────────────────── */
@@ -353,20 +378,20 @@ footer {
   width:6px; height:6px; border-radius:50%; border:1px solid var(--border-strong);
   background:transparent; transition:all .4s; cursor:pointer;
 }
-.si-dot.active { background:var(--text-main); border-color:var(--text-main); transform:scale(1.4); }
+.si-dot.active { background:var(--accent-cyan); border-color:var(--accent-cyan); transform:scale(1.4); }
 
 /* ── 3D STATE BADGE ───────────────────────────── */
 .state-badge {
   position:fixed; bottom:2rem; left:50%; transform:translateX(-50%);
   z-index:500; display:flex; align-items:center; gap:.8rem;
   padding:.5rem 1.4rem; background:var(--bg-glass);
-  border:1px solid var(--border); border-radius:2px;
+  border:1px solid var(--border); border-radius:3px;
   font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--text-muted); backdrop-filter:blur(10px);
-  transition:opacity .5s; box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  color:var(--accent-navy); backdrop-filter:blur(10px);
+  transition:opacity .5s; box-shadow: 0 4px 20px rgba(0,173,239,0.08);
 }
-.state-badge::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--accent); animation:blink 2s infinite; }
-.state-badge-text { color:var(--text-main); font-weight:600; }
+.state-badge::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--accent-cyan); animation:blink 2s infinite; }
+.state-badge-text { color:var(--accent-navy); font-weight:700; }
 
 /* ── PERF OVERLAY ─────────────────────────────── */
 #perf { position:fixed; top:5rem; right:1rem; z-index:999; font-size:.65rem; color:var(--text-light); font-family:monospace; pointer-events:none; }
@@ -405,8 +430,36 @@ footer {
 <!-- NAV -->
 <nav>
   <a href="#sec-home" class="nav-brand">
-    Sai Meghana Technical Consultants LLP
-    <span>Hyderabad · Telangana · India</span>
+    <div class="brand-icon">
+      <!-- High-fidelity Scalable Vector Logo derived from provided image -->
+      <svg viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(100, 5)">
+          <!-- Top Chevron -->
+          <polygon points="0,0 22,25 0,16" fill="#001a4d" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          <polygon points="0,0 -22,25 0,16" fill="#00a8e8" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          
+          <!-- Layer 2 -->
+          <polygon points="0,11 44,48 0,33" fill="#002b66" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          <polygon points="0,11 -44,48 0,33" fill="#00b4d8" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          
+          <!-- Layer 3 -->
+          <polygon points="0,22 66,71 0,50" fill="#003c80" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          <polygon points="0,22 -66,71 0,50" fill="#00c0f0" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          
+          <!-- Layer 4 -->
+          <polygon points="0,33 88,94 0,67" fill="#004d99" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          <polygon points="0,33 -88,94 0,67" fill="#00ccff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          
+          <!-- Layer 5 (Bottom) -->
+          <polygon points="0,44 110,117 0,84" fill="#0066b3" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+          <polygon points="0,44 -110,117 0,84" fill="#00d4ff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+        </g>
+      </svg>
+    </div>
+    <div class="brand-text">
+      Sai Meghana
+      <span>Technical Consultants</span>
+    </div>
   </a>
   <div class="nav-links">
     <a href="#sec-home" class="active" data-nav>Home</a>
@@ -428,7 +481,7 @@ footer {
       <h1 class="hero-title">Engineering<br><em>Excellence.</em><br>Built to Last.</h1>
       <p class="hero-sub">End-to-end civil, structural, and architectural consultancy for industrial and infrastructure projects across Telangana and beyond.</p>
       <div class="hero-btns">
-        <a href="#sec-services" class="btn-gold">Explore Services →</a>
+        <a href="#sec-services" class="btn-primary">Explore Services →</a>
         <a href="tel:+919963399663" class="btn-outline">📞 +91 99633 99663</a>
       </div>
     </div>
@@ -508,7 +561,7 @@ footer {
           <div><div class="legal-item-label">Turnover Range</div><div class="legal-item-val">0 – 40 Lakh p.a.</div></div>
           <div><div class="legal-item-label">Experience</div><div class="legal-item-val">11+ Years Active</div></div>
         </div>
-        <div style="margin-top:1.8rem;padding:1.5rem;border:1px solid var(--border);border-radius:2px;background:var(--bg-main);">
+        <div style="margin-top:1.8rem;padding:1.5rem;border:1px solid var(--border);border-radius:3px;background:var(--bg-main);">
           <p style="font-size:.88rem;color:var(--text-muted);line-height:1.7">Our values: <strong style="color:var(--text-main)">Precision · Integrity · Timeliness · Excellence</strong><br>We don't deliver minimum viable — we deliver exceptional. Every project reflects our highest standards of workmanship and our deep respect for the built environment.</p>
         </div>
       </div>
@@ -560,8 +613,8 @@ footer {
         </div>
         <div id="successArea" style="display:none;text-align:center;padding:2.5rem 1rem">
           <div style="font-size:2.5rem;margin-bottom:1rem">✅</div>
-          <h4 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text-main);margin-bottom:.6rem">Enquiry Sent!</h4>
-          <p style="font-size:.9rem;color:var(--text-muted);line-height:1.8">Your message has been sent to <strong style="color:var(--text-main)">vnvlrao@yahoo.com</strong>.<br>We'll respond within one business day.<br><br>For urgent needs: <a href="tel:+919963399663" style="color:var(--text-main)">+91 99633 99663</a></p>
+          <h4 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--accent-navy);margin-bottom:.6rem">Enquiry Sent!</h4>
+          <p style="font-size:.9rem;color:var(--text-muted);line-height:1.8">Your message has been sent to <strong style="color:var(--accent-cyan)">vnvlrao@yahoo.com</strong>.<br>We'll respond within one business day.<br><br>For urgent needs: <a href="tel:+919963399663" style="color:var(--accent-navy)">+91 99633 99663</a></p>
         </div>
       </div>
     </div>
@@ -570,7 +623,24 @@ footer {
 </div><!-- /scroll-container -->
 
 <footer>
-  <div><div class="ft-brand">Sai Meghana Technical Consultants LLP</div><div class="ft-meta">Hyderabad, Telangana · GST: 36**********1ZZ · Reg. Oct 2024</div></div>
+  <div>
+    <div class="ft-brand" style="display:flex;align-items:center;gap:12px;">
+      <div style="width: 24px; height: 24px;">
+        <svg viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(100, 5)">
+            <polygon points="0,0 22,25 0,16" fill="#ffffff" stroke="#002147" stroke-width="2" stroke-linejoin="round"/>
+            <polygon points="0,0 -22,25 0,16" fill="#00adef" stroke="#002147" stroke-width="2" stroke-linejoin="round"/>
+            <polygon points="0,11 44,48 0,33" fill="#ffffff" stroke="#002147" stroke-width="2" stroke-linejoin="round"/>
+            <polygon points="0,11 -44,48 0,33" fill="#00adef" stroke="#002147" stroke-width="2" stroke-linejoin="round"/>
+            <polygon points="0,22 66,71 0,50" fill="#ffffff" stroke="#002147" stroke-width="2" stroke-linejoin="round"/>
+            <polygon points="0,22 -66,71 0,50" fill="#00adef" stroke="#002147" stroke-width="2" stroke-linejoin="round"/>
+          </g>
+        </svg>
+      </div>
+      SAI MEGHANA TECHNICAL CONSULTANTS
+    </div>
+    <div class="ft-meta">Hyderabad, Telangana · GST: 36**********1ZZ · Reg. Oct 2024</div>
+  </div>
   <div class="ft-links">
     <a href="#sec-home">Home</a><a href="#sec-services">Services</a><a href="#sec-expertise">Expertise</a><a href="#sec-about">About</a><a href="#sec-contact">Contact</a>
   </div>
@@ -585,7 +655,7 @@ footer {
 /* ═══════════════════════════════════════════════════════════
    SAI MEGHANA — INTERACTIVE 3D BACKGROUND ENGINE
    Architecture: Three.js r128
-   Theme: High Contrast Monochrome (White Ground, Black/Grey Details)
+   Theme: Cyan & Navy Blueprint Integration 
    Interaction: Desktop Hover Raycasting, Drag to Orbit, Particle Repulsion
 ═══════════════════════════════════════════════════════════ */
 
@@ -626,33 +696,38 @@ const state = {
 
 const raycaster = new THREE.Raycaster();
 
-// ── MINIMAL DARK 3D PALETTE ──────────────────────────────
+// ── MINIMAL THEME PALETTE (CYAN & NAVY) ──────────────────
 const C = {
   ground: new THREE.Color(0xffffff),
+  cyan:   new THREE.Color(0x00adef),
+  navy:   new THREE.Color(0x001f3f)
 };
 
-// ── MATERIALS (Dark Grey & Black Profiles) ────────────────
+// ── MATERIALS ─────────────────────────────────────────────
 const MAT = {
+  // Cyan glowing blueprints
   blueprint: new THREE.MeshBasicMaterial({
-    color: 0x000000, wireframe: true, transparent: true, opacity: 0.15
+    color: C.cyan, wireframe: true, transparent: true, opacity: 0.15
   }),
   blueprintGlow: new THREE.LineBasicMaterial({
-    color: 0x000000, transparent: true, opacity: 0.25
+    color: C.cyan, transparent: true, opacity: 0.35
   }),
+  // Navy blue assembly phase
   assembly: new THREE.MeshLambertMaterial({
-    color: 0x555555, transparent: true, opacity: 0.8,
-    emissive: 0x222222, emissiveIntensity: 0.1
+    color: 0x003366, transparent: true, opacity: 0.7,
+    emissive: 0x001229, emissiveIntensity: 0.2
   }),
+  // Clean white solids with subtle cyan bounce light
   solid: new THREE.MeshLambertMaterial({
-    color: 0x2a2a2a,
-    emissive: 0x000000, emissiveIntensity: 0.0
+    color: 0xffffff,
+    emissive: C.cyan, emissiveIntensity: 0.05
   }),
   ground: new THREE.MeshLambertMaterial({ color: C.ground }),
   gridLine: new THREE.LineBasicMaterial({
-    color: 0x000000, transparent: true, opacity: 0.08
+    color: C.cyan, transparent: true, opacity: 0.08
   }),
   pipe: new THREE.MeshLambertMaterial({
-    color: 0x444444, emissive: 0x111111, emissiveIntensity: 0.1
+    color: 0xe0f4fc, emissive: 0x00adef, emissiveIntensity: 0.1
   }),
 };
 
@@ -660,7 +735,7 @@ const MAT = {
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 0.9);
+const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
 sunLight.position.set(30, 60, 20);
 sunLight.castShadow = true;
 sunLight.shadow.mapSize.set(1024, 1024);
@@ -673,11 +748,12 @@ sunLight.shadow.camera.bottom = -80;
 sunLight.shadow.bias = -0.001;
 scene.add(sunLight);
 
-const goldLight = new THREE.PointLight(0xffffff, 1.0, 80);
-goldLight.position.set(0, 20, 10);
-scene.add(goldLight);
+// Cool cyan fill light
+const cyanLight = new THREE.PointLight(0x00adef, 1.2, 80);
+cyanLight.position.set(0, 20, 10);
+scene.add(cyanLight);
 
-const rimLight = new THREE.DirectionalLight(0x888888, 0.5);
+const rimLight = new THREE.DirectionalLight(0x004d99, 0.5);
 rimLight.position.set(-30, 10, -20);
 scene.add(rimLight);
 
@@ -710,7 +786,7 @@ function buildGrid() {
     new THREE.Vector3(size/2, 0.04, 0)
   ]);
   const axisLine = new THREE.Line(axisGeo, new THREE.LineBasicMaterial({
-    color: 0x000000, transparent: true, opacity: 0.15
+    color: C.navy, transparent: true, opacity: 0.15
   }));
   group.add(axisLine);
 
@@ -792,7 +868,7 @@ function createSilo(r, h, x, z) {
   const geo = new THREE.CylinderGeometry(r, r * 1.1, h, 12);
   const bp = new THREE.Mesh(geo, MAT.blueprint.clone());
   const solid = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({
-    color: 0x2a2a2a, emissive: 0x000000, emissiveIntensity: 0.0
+    color: 0xffffff, emissive: C.cyan, emissiveIntensity: 0.05
   }));
   solid.visible = false;
   solid.castShadow = true;
@@ -806,7 +882,7 @@ function createSilo(r, h, x, z) {
 function buildUnderground() {
   const group = new THREE.Group();
   const pipeColor = new THREE.MeshLambertMaterial({
-    color: 0x444444, emissive: 0x111111, emissiveIntensity: 0.1,
+    color: 0x90e0ef, emissive: 0x0077b6, emissiveIntensity: 0.1,
     transparent: true, opacity: 0.85
   });
 
@@ -830,7 +906,7 @@ function buildUnderground() {
   return group;
 }
 
-// ── PARTICLE SYSTEM (Interactive Dark Dust) ───────────
+// ── PARTICLE SYSTEM (Interactive Cyan Dust) ───────────
 class ParticleSystem {
   constructor() {
     this.count = 250;
@@ -844,8 +920,8 @@ class ParticleSystem {
 
     this.geo.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
     this.mat = new THREE.PointsMaterial({
-      color: 0x000000, size: 0.25, // Much darker and slightly larger
-      transparent: true, opacity: 0.8, // Highly visible against white
+      color: 0x00adef, size: 0.3, // Cyan particles
+      transparent: true, opacity: 0.6, 
       sizeAttenuation: true,
       blending: THREE.NormalBlending,
       depthWrite: false
@@ -866,37 +942,33 @@ class ParticleSystem {
   }
 
   update(intensity = 1.0, mouseX, mouseY) {
-    // Map normalized mouse (-1 to 1) roughly to world plane bounds for repulsion
     let worldMouseX = mouseX * 30;
-    let worldMouseY = -mouseY * 30; // Inverse Y for 3D translation
+    let worldMouseY = -mouseY * 30; 
     
     for (let i = 0; i < this.count; i++) {
       this.ages[i]++;
       if (this.ages[i] > this.maxAges[i]) { this.spawn(i); continue; }
       
-      // Basic movement
       this.positions[i*3]   += this.velocities[i*3];
       this.positions[i*3+1] += this.velocities[i*3+1];
       this.positions[i*3+2] += this.velocities[i*3+2];
       this.velocities[i*3+1] -= 0.0004; // Gravity
       
-      // Interactive Repulsion (Push particles away from mouse)
       let dx = this.positions[i*3] - worldMouseX;
-      let dy = this.positions[i*3+1] - worldMouseY; // approximate Z mapping to Y for simplicity
+      let dy = this.positions[i*3+1] - worldMouseY; 
       let distSq = dx*dx + dy*dy;
       
       if (distSq < 150) {
           this.velocities[i*3] += dx * 0.0008;
-          this.velocities[i*3+1] += dy * 0.0008; // Pushes them UP/DOWN slightly
-          this.velocities[i*3+2] += dy * 0.0008; // Pushes them in Z
+          this.velocities[i*3+1] += dy * 0.0008; 
+          this.velocities[i*3+2] += dy * 0.0008; 
       }
       
-      // Drag Dampening
       this.velocities[i*3] *= 0.98;
       this.velocities[i*3+2] *= 0.98;
     }
     this.geo.attributes.position.needsUpdate = true;
-    this.mat.opacity = 0.8 * intensity; 
+    this.mat.opacity = 0.6 * intensity; 
   }
 }
 
@@ -964,7 +1036,6 @@ function applyBuildState(group, progress) {
 
       obj.scale.y = 0.05 + localProg * 0.95;
       
-      // Interactive Hover Scale
       const targetScaleXZ = obj.userData.isHovered ? 1.05 : 1.0;
       if(obj.scale.x === undefined) obj.scale.x = 1;
       obj.scale.x = lerp(obj.scale.x, targetScaleXZ, 0.1);
@@ -975,7 +1046,7 @@ function applyBuildState(group, progress) {
         const t = mesh.userData.type;
         if (t === 'blueprint') {
           mesh.visible = localProg < 0.5;
-          if (mesh.material) mesh.material.opacity = (0.5 - localProg) * 0.3;
+          if (mesh.material) mesh.material.opacity = (0.5 - localProg) * 0.35; 
         } else if (t === 'assembly') {
           mesh.visible = localProg >= 0.3 && localProg < 0.85;
           if (mesh.material) mesh.material.opacity = Math.sin(localProg * Math.PI) * 0.85;
@@ -983,8 +1054,7 @@ function applyBuildState(group, progress) {
           mesh.visible = localProg >= 0.7;
           if (mesh.material) {
              mesh.material.opacity = Math.min(1, (localProg - 0.7) / 0.3);
-             // Highlight emissive slightly on hover
-             mesh.material.emissiveIntensity = obj.userData.isHovered ? 0.2 : 0.0;
+             mesh.material.emissiveIntensity = obj.userData.isHovered ? 0.3 : 0.05;
           }
         }
       });
@@ -999,10 +1069,10 @@ function applyBuildState(group, progress) {
       obj.scale.z = obj.scale.x;
       
       const [bp, solid] = obj.children;
-      if (bp?.material) { bp.material.opacity = (1 - localProg) * 0.2; bp.visible = localProg < 0.8; }
+      if (bp?.material) { bp.material.opacity = (1 - localProg) * 0.25; bp.visible = localProg < 0.8; }
       if (solid) { 
           solid.visible = localProg > 0.6; 
-          solid.material.emissiveIntensity = obj.userData.isHovered ? 0.2 : 0.0;
+          solid.material.emissiveIntensity = obj.userData.isHovered ? 0.3 : 0.05;
       }
     }
   });
@@ -1015,10 +1085,10 @@ function applyFrameState(progress) {
     frame.children.forEach(child => {
       if (child.material) {
         if (child instanceof THREE.Line) {
-          child.material.opacity = 0.1 + lp * 0.2;
+          child.material.opacity = 0.1 + lp * 0.25;
         } else {
           child.material.opacity = 0.1 + lp * 0.2;
-          child.material.emissiveIntensity = lp * 0.05;
+          child.material.emissiveIntensity = lp * 0.1;
         }
       }
     });
@@ -1034,7 +1104,6 @@ function handleMove(clientX, clientY) {
   state.targetMouse.y = (clientY / window.innerHeight - 0.5) * 2;
 }
 
-// Desktop Mouse
 window.addEventListener('mousedown', (e) => {
     state.isDragging = true;
     previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -1044,12 +1113,11 @@ window.addEventListener('mousemove', (e) => {
     handleMove(e.clientX, e.clientY);
     if (state.isDragging) {
         const deltaX = e.clientX - previousMousePosition.x;
-        state.dragOffset.x -= deltaX * 0.005; // Negative to drag opposite way
+        state.dragOffset.x -= deltaX * 0.005; 
     }
     previousMousePosition = { x: e.clientX, y: e.clientY };
 });
 
-// Mobile Touch
 window.addEventListener('touchstart', (e) => {
     state.isDragging = true;
     previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -1163,7 +1231,6 @@ function animate(now = 0) {
     fpsFrames = 0; fpsAccum = 0;
   }
 
-  // Smooth mouse
   state.mouse.x = lerp(state.mouse.x, state.targetMouse.x, 0.08);
   state.mouse.y = lerp(state.mouse.y, state.targetMouse.y, 0.08);
 
@@ -1188,7 +1255,6 @@ function animate(now = 0) {
   // ── RAYCASTING (HOVER EFFECT) ──
   raycaster.setFromCamera(state.mouse, camera);
   
-  // Reset all hovers
   sceneGroups.buildings.children.forEach(b => b.userData.isHovered = false);
   sceneGroups.silos.children.forEach(s => s.userData.isHovered = false);
   
@@ -1219,7 +1285,6 @@ function animate(now = 0) {
   });
 
   const particleIntensity = Math.max(0, 1 - Math.abs(buildProg - 0.5) * 3);
-  // Pass mouse state to particle system for repulsion effect
   sceneGroups.particles.update(particleIntensity, state.mouse.x, state.mouse.y);
 
   sceneGroups.terrain.children.forEach(child => {
@@ -1231,12 +1296,10 @@ function animate(now = 0) {
     }
   });
 
-  // Slowly return drag offset back to 0 when not dragging
   if (!state.isDragging) {
       state.dragOffset.x = lerp(state.dragOffset.x, 0, 0.02);
   }
 
-  // Base rotation from mouse + Manual Drag rotation
   let targetRotationY = (state.mouse.x * 0.05) + state.dragOffset.x;
   
   sceneGroups.buildings.rotation.y = lerp(
