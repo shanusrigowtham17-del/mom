@@ -10,14 +10,14 @@
 /* ── RESET & ROOT ─────────────────────────────── */
 :root {
   --bg-main: #ffffff;
-  --bg-alt: #efefef; /* Slightly darker grey for contrast */
-  --bg-glass: rgba(248, 248, 248, 0.88); /* Slightly darker frosted glass */
+  --bg-alt: #efefef;
+  --bg-glass: rgba(248, 248, 248, 0.88);
   
   --text-main: #111111;
   --text-muted: #737373;
   --text-light: #999999;
   
-  --accent: #b4a072; /* Muted architectural gold */
+  --accent: #b4a072;
   --accent-hover: #9c895d;
   
   --border: rgba(0, 0, 0, 0.08);
@@ -162,7 +162,7 @@ nav {
 
 /* ── SECTION STYLES ──────────────────────────── */
 .sec-bg-dark { background:var(--bg-glass); }
-.sec-bg-mid  { background:rgba(239,239,239,0.85); } /* Slightly darker mid bg */
+.sec-bg-mid  { background:rgba(239,239,239,0.85); }
 .sec-label {
   font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
   color:var(--text-light); font-weight:600; margin-bottom:.7rem;
@@ -573,6 +573,7 @@ footer {
 /* ═══════════════════════════════════════════════════════════
    SAI MEGHANA — MINIMAL 3D BACKGROUND ENGINE
    Architecture: Three.js r128
+   Theme: High Contrast Monochrome (White Ground, Black/Grey Details)
 ═══════════════════════════════════════════════════════════ */
 
 // ── CORE SETUP ──────────────────────────────────────────
@@ -586,7 +587,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 
 const scene = new THREE.Scene();
-// Minimal light grey fog blending into white
+// Keep the fog white to maintain the UI background theme
 scene.fog = new THREE.FogExp2(0xffffff, 0.012);
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
@@ -609,45 +610,39 @@ const state = {
   cameraTarget: new THREE.Vector3(0, 14, 52),
 };
 
-// ── MINIMAL WHITE THEME PALETTE ──────────────────────────
+// ── MINIMAL DARK 3D PALETTE ──────────────────────────────
 const C = {
-  gold:        new THREE.Color(0xb4a072),
-  lineDark:    new THREE.Color(0x333333),
-  navy:        new THREE.Color(0xffffff),
-  navyMid:     new THREE.Color(0xfafafa),
-  steel:       new THREE.Color(0xe8e8e8),
-  concrete:    new THREE.Color(0xfbfbfb),
-  ground:      new THREE.Color(0xffffff),
+  ground: new THREE.Color(0xffffff), // Base remains white for fog blending
 };
 
-// ── MATERIALS ────────────────────────────────────────────
+// ── MATERIALS (Dark Grey & Black Profiles) ────────────────
 const MAT = {
-  // Delicate pencil-like architectural lines
+  // Pure black pencil/wireframe lines
   blueprint: new THREE.MeshBasicMaterial({
-    color: 0x111111, wireframe: true, transparent: true, opacity: 0.08
+    color: 0x000000, wireframe: true, transparent: true, opacity: 0.15
   }),
   blueprintGlow: new THREE.LineBasicMaterial({
-    color: 0x111111, transparent: true, opacity: 0.15
+    color: 0x000000, transparent: true, opacity: 0.25
   }),
-  // Clean minimal assembly solids
+  // Translucent dark grey for assembly phase
   assembly: new THREE.MeshLambertMaterial({
-    color: 0xf0f0f0, transparent: true, opacity: 0.8,
-    emissive: 0xffffff, emissiveIntensity: 0.1
+    color: 0x555555, transparent: true, opacity: 0.8,
+    emissive: 0x222222, emissiveIntensity: 0.1
   }),
-  // Final crisp white solids
+  // Solid sleek dark grey/black for finished structures
   solid: new THREE.MeshLambertMaterial({
-    color: 0xffffff,
-    emissive: 0xf5f5f5, emissiveIntensity: 0.2
+    color: 0x2a2a2a,
+    emissive: 0x000000, emissiveIntensity: 0.0
   }),
   ground: new THREE.MeshLambertMaterial({ color: C.ground }),
   gridLine: new THREE.LineBasicMaterial({
-    color: 0x000000, transparent: true, opacity: 0.04
+    color: 0x000000, transparent: true, opacity: 0.08
   }),
   pipe: new THREE.MeshLambertMaterial({
-    color: 0xe0e0e0, emissive: 0xffffff, emissiveIntensity: 0.1
+    color: 0x444444, emissive: 0x111111, emissiveIntensity: 0.1
   }),
   glowCore: new THREE.MeshBasicMaterial({
-    color: 0xffffff, transparent: true, opacity: 0.5
+    color: 0x111111, transparent: true, opacity: 0.5
   }),
 };
 
@@ -673,7 +668,7 @@ const goldLight = new THREE.PointLight(0xffffff, 1.0, 80);
 goldLight.position.set(0, 20, 10);
 scene.add(goldLight);
 
-const rimLight = new THREE.DirectionalLight(0xe8e8e8, 0.5);
+const rimLight = new THREE.DirectionalLight(0x888888, 0.5);
 rimLight.position.set(-30, 10, -20);
 scene.add(rimLight);
 
@@ -709,7 +704,7 @@ function buildGrid() {
     new THREE.Vector3(size/2, 0.04, 0)
   ]);
   const axisLine = new THREE.Line(axisGeo, new THREE.LineBasicMaterial({
-    color: 0x000000, transparent: true, opacity: 0.1
+    color: 0x000000, transparent: true, opacity: 0.15
   }));
   group.add(axisLine);
 
@@ -791,7 +786,7 @@ function createSilo(r, h, x, z) {
   const geo = new THREE.CylinderGeometry(r, r * 1.1, h, 12);
   const bp = new THREE.Mesh(geo, MAT.blueprint.clone());
   const solid = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({
-    color: 0xfcfcfc, emissive: 0xffffff, emissiveIntensity: 0.1
+    color: 0x2a2a2a, emissive: 0x000000, emissiveIntensity: 0.0
   }));
   solid.visible = false;
   solid.castShadow = true;
@@ -805,7 +800,7 @@ function createSilo(r, h, x, z) {
 function buildUnderground() {
   const group = new THREE.Group();
   const pipeColor = new THREE.MeshLambertMaterial({
-    color: 0xdddddd, emissive: 0xeeeeee, emissiveIntensity: 0.1,
+    color: 0x444444, emissive: 0x111111, emissiveIntensity: 0.1,
     transparent: true, opacity: 0.85
   });
 
@@ -843,8 +838,8 @@ class ParticleSystem {
 
     this.geo.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
     this.mat = new THREE.PointsMaterial({
-      color: 0x111111, size: 0.2, // Darkened particle color
-      transparent: true, opacity: 0.3, // Increased opacity
+      color: 0x111111, size: 0.2, // Dark particles
+      transparent: true, opacity: 0.4,
       sizeAttenuation: true,
       blending: THREE.NormalBlending,
       depthWrite: false
@@ -875,7 +870,7 @@ class ParticleSystem {
       this.velocities[i*3+1] -= 0.0004;
     }
     this.geo.attributes.position.needsUpdate = true;
-    this.mat.opacity = 0.3 * intensity; // Adjusted max opacity mapping
+    this.mat.opacity = 0.4 * intensity; 
   }
 }
 
@@ -946,7 +941,7 @@ function applyBuildState(group, progress) {
         const t = mesh.userData.type;
         if (t === 'blueprint') {
           mesh.visible = localProg < 0.5;
-          if (mesh.material) mesh.material.opacity = (0.5 - localProg) * 0.16;
+          if (mesh.material) mesh.material.opacity = (0.5 - localProg) * 0.3; // Increased visibility for black wires
         } else if (t === 'assembly') {
           mesh.visible = localProg >= 0.3 && localProg < 0.85;
           if (mesh.material) mesh.material.opacity = Math.sin(localProg * Math.PI) * 0.85;
@@ -961,7 +956,7 @@ function applyBuildState(group, progress) {
       const localProg = Math.max(0, Math.min(1, progress));
       obj.scale.y = 0.02 + localProg * 0.98;
       const [bp, solid] = obj.children;
-      if (bp?.material) { bp.material.opacity = (1 - localProg) * 0.1; bp.visible = localProg < 0.8; }
+      if (bp?.material) { bp.material.opacity = (1 - localProg) * 0.2; bp.visible = localProg < 0.8; }
       if (solid) { solid.visible = localProg > 0.6; }
     }
   });
@@ -974,9 +969,9 @@ function applyFrameState(progress) {
     frame.children.forEach(child => {
       if (child.material) {
         if (child instanceof THREE.Line) {
-          child.material.opacity = 0.05 + lp * 0.15;
+          child.material.opacity = 0.1 + lp * 0.2;
         } else {
-          child.material.opacity = 0.05 + lp * 0.1;
+          child.material.opacity = 0.1 + lp * 0.2;
           child.material.emissiveIntensity = lp * 0.05;
         }
       }
@@ -1134,15 +1129,12 @@ function animate(now = 0) {
 
   const particleIntensity = Math.max(0, 1 - Math.abs(buildProg - 0.5) * 3);
   sceneGroups.particles.update(particleIntensity);
-  
-  // Opacity update moved into update() function for smoother logic, kept local assignment to prevent overriding
-  // sceneGroups.particles.mat.opacity = particleIntensity * 0.3;
 
   sceneGroups.terrain.children.forEach(child => {
     if (child instanceof THREE.Line) {
       const mat = child.material;
       if (mat && mat !== MAT.gridLine) {
-        mat.opacity = 0.06 + Math.sin(state.time * 0.5) * 0.04;
+        mat.opacity = 0.08 + Math.sin(state.time * 0.5) * 0.06;
       }
     }
   });
